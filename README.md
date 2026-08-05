@@ -2,7 +2,7 @@
 
 A mobile-first personal expense tracker that works as an installable web app on iPhone.
 
-It includes category pie charts, Day/Week 1–4/Month/Year views, ten-item pagination, editing, and Excel import/export.
+It includes category and meal-type pie charts, Day/Week 1–4/Month/Year views, ten-item pagination, editing, and Excel import/export.
 
 ## Privacy
 
