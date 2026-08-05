@@ -38,7 +38,7 @@
   <div id="installTip" class="install"><strong>Add SpendWise to your Home Screen</strong>In Safari, tap Share, then <b>Add to Home Screen</b>. Open it once online first; afterwards it can work offline.</div>
   <section class="hero"><div class="eyebrow">Selected spending</div><div id="heroTotal" class="hero-total">RM 0.00</div><div id="heroPeriod" class="hero-period">Today</div></section>
 
-  <section class="section"><div class="stats"><div class="stat"><span>Today</span><strong id="todayTotal">RM 0.00</strong></div><div class="stat"><span>This month</span><strong id="monthTotal">RM 0.00</strong></div><div class="stat"><span>This year</span><strong id="yearTotal">RM 0.00</strong></div><div class="stat"><span>All time</span><strong id="allTotal">RM 0.00</strong></div></div></section>
+  <section class="section"><div class="stats"><div class="stat"><span>This week</span><strong id="weekTotal">RM 0.00</strong></div><div class="stat"><span>This month</span><strong id="monthTotal">RM 0.00</strong></div><div class="stat"><span>This year</span><strong id="yearTotal">RM 0.00</strong></div><div class="stat"><span>All time</span><strong id="allTotal">RM 0.00</strong></div></div></section>
 
   <section class="section"><div class="section-head"><h2 id="formTitle">Add expense</h2></div><div class="card"><form id="expenseForm"><div class="form-grid">
     <div class="field full"><label for="title">What did you buy?</label><input id="title" maxlength="80" placeholder="Example: Lunch" required></div>
@@ -100,7 +100,8 @@ function selected(){const {start,end}=bounds();return expenses.filter(e=>inRange
 function sumRange(a,b){return total(expenses.filter(e=>inRange(e,a,b)))}
 function render(){const list=selected(); const now=parseDate(today());
   $('heroTotal').textContent=money(total(list));$('heroPeriod').textContent=rangeLabel();
-  $('todayTotal').textContent=money(sumRange(today(),today()));
+  const currentWeek=Math.min(4,Math.ceil(now.getDate()/7)),weekStart=new Date(now.getFullYear(),now.getMonth(),(currentWeek-1)*7+1),weekEnd=new Date(now.getFullYear(),now.getMonth(),currentWeek===4?new Date(now.getFullYear(),now.getMonth()+1,0).getDate():currentWeek*7);
+  $('weekTotal').textContent=money(sumRange(localDate(weekStart),localDate(weekEnd)));
   $('monthTotal').textContent=money(sumRange(localDate(new Date(now.getFullYear(),now.getMonth(),1)),localDate(new Date(now.getFullYear(),now.getMonth()+1,0))));
   $('yearTotal').textContent=money(sumRange(`${now.getFullYear()}-01-01`,`${now.getFullYear()}-12-31`));$('allTotal').textContent=money(total(expenses));
   renderPie(list);renderMealPie(list);renderList(list)
