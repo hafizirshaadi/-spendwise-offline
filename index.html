@@ -78,6 +78,8 @@ $('category').innerHTML=categories.map(c=>`<option>${c.name}</option>`).join('')
 function isMealCategory(name){return name==='Food & Drink'||name==='Dining & Dates'}
 function toggleMealField(){const show=isMealCategory($('category').value);$('mealField').hidden=!show;$('mealType').required=show;if(!show)$('mealType').value=''}
 $('category').addEventListener('change',toggleMealField);toggleMealField();
+window.addEventListener('pageshow',()=>setTimeout(toggleMealField,50));
+document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible')setTimeout(toggleMealField,50)});
 
 function load(){try{const data=JSON.parse(localStorage.getItem(STORAGE_KEY)||'[]');return Array.isArray(data)?data:[]}catch{return []}}
 function save(){localStorage.setItem(STORAGE_KEY,JSON.stringify(expenses))}
