@@ -78,7 +78,7 @@ $('category').innerHTML=categories.map(c=>`<option>${c.name}</option>`).join('')
 function isMealCategory(name){return name==='Food & Drink'||name==='Dining & Dates'}
 function toggleMealField(){const show=isMealCategory($('category').value);$('mealField').hidden=!show;$('mealType').required=show;if(!show)$('mealType').value=''}
 $('category').addEventListener('change',toggleMealField);toggleMealField();
-window.addEventListener('pageshow',()=>setTimeout(toggleMealField,50));
+window.addEventListener('pageshow',()=>setTimeout(()=>{toggleMealField();if(!editingId)$('payment').value='Maybank'},50));
 document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible')setTimeout(toggleMealField,50)});
 
 function load(){try{const data=JSON.parse(localStorage.getItem(STORAGE_KEY)||'[]');return Array.isArray(data)?data:[]}catch{return []}}
@@ -119,7 +119,7 @@ $('expenseForm').addEventListener('submit',e=>{e.preventDefault();const category
   if(!record.title||!record.date||record.amount<=0||(isMealCategory(category)&&!record.mealType))return toast('Please complete every field.');if(editingId){const old=expenses.find(x=>x.id===editingId);record.createdAt=old?.createdAt||record.createdAt;expenses=expenses.map(x=>x.id===editingId?record:x);toast('Expense updated.')}else{expenses.push(record);toast('Expense added.')}
   save();resetForm();selectDate(record.date);page=1;renderFilterControls();render()
 });
-function resetForm(){editingId=null;$('expenseForm').reset();$('date').value=today();$('formTitle').textContent='Add expense';$('saveBtn').textContent='Add expense';$('cancelEdit').hidden=true;toggleMealField()}
+function resetForm(){editingId=null;$('expenseForm').reset();$('date').value=today();$('payment').value='Maybank';$('formTitle').textContent='Add expense';$('saveBtn').textContent='Add expense';$('cancelEdit').hidden=true;toggleMealField()}
 $('cancelEdit').addEventListener('click',resetForm);
 $('expenseList').addEventListener('click',e=>{const edit=e.target.dataset.edit,del=e.target.dataset.delete;if(edit){const x=expenses.find(v=>v.id===edit);if(!x)return;editingId=x.id;$('title').value=x.title;$('amount').value=x.amount;$('date').value=x.date;$('category').value=x.category;toggleMealField();$('mealType').value=x.mealType||'';$('payment').value=x.payment;$('formTitle').textContent='Edit expense';$('saveBtn').textContent='Save changes';$('cancelEdit').hidden=false;scrollTo({top:$('expenseForm').getBoundingClientRect().top+scrollY-25,behavior:'smooth'})}
   if(del&&confirm('Delete this expense?')){expenses=expenses.filter(v=>v.id!==del);save();render();toast('Expense deleted.')}});
