@@ -60,6 +60,7 @@
     <div class="segmented" id="periodTabs"><button data-period="day" class="active">Day</button><button data-period="week">Week</button><button data-period="month">Month</button><button data-period="year">Year</button></div>
     <div class="date-row" id="filterControls"></div>
     <div class="filter-head"><span>Filter by category</span><button id="clearCategoryFilter" type="button">Select all</button></div><div id="categoryFilters" class="category-chips"></div>
+    <div class="filter-head"><span>Filter by payment type</span><button id="clearPaymentFilter" type="button">Select all</button></div><div id="paymentFilters" class="category-chips"></div>
     <div class="filtered-total"><span id="filteredTotalLabel">All categories total</span><strong id="filteredTotal">RM 0.00</strong></div>
     <div class="chart-title">Category overview</div>
     <div id="categoryChart"></div>
@@ -76,10 +77,11 @@ const STORAGE_KEY='spendwise-expenses-v1';
 const categories=[
   {name:'Food & Drink',icon:'🍽️'}, {name:'Dining & Dates',icon:'🥂'},
   {name:'Shopee',icon:'🛍️'}, {name:'Fuel',icon:'⛽'}, {name:'Skincare',icon:'🧴'},
-  {name:'Room Rent',icon:'🏠'}, {name:'Souvenirs & Gifts',icon:'🎁'}, {name:'Other Expenses',icon:'✨'}
+  {name:'Room Rent',icon:'🏠'}, {name:'Clothing',icon:'👕'}, {name:'Souvenirs & Gifts',icon:'🎁'}, {name:'Other Expenses',icon:'✨'}
 ];
 const mealTypes=['Breakfast','Lunch','Tea','Dinner','Late Dinner'];
-let expenses=load(), editingId=null, period='day', page=1, searchQuery='';const selectedCategories=new Set();const PAGE_SIZE=10;
+const paymentTypes=['Maybank','Bank Islam','Cash'];
+let expenses=load(), editingId=null, period='day', page=1, searchQuery='';const selectedCategories=new Set(),selectedPayments=new Set();const PAGE_SIZE=10;
 const $=id=>document.getElementById(id); const localDate=d=>{const x=new Date(d);x.setMinutes(x.getMinutes()-x.getTimezoneOffset());return x.toISOString().slice(0,10)};
 const today=()=>localDate(new Date()); const nowDate=today();
 const selection={day:nowDate,month:nowDate.slice(0,7),week:calendarWeekIndex(nowDate),year:nowDate.slice(0,4)};
@@ -109,19 +111,19 @@ function rangeLabel(){const monthName=m=>parseDate(`${m}-01`).toLocaleDateString
 function iconFor(name){return categories.find(c=>c.name===name)?.icon||'✨'}
 function escapeHtml(v){return String(v).replace(/[&<>'"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c]))}
 function selected(){const {start,end}=bounds();return expenses.filter(e=>inRange(e,start,end)).sort((a,b)=>b.date.localeCompare(a.date)||b.createdAt.localeCompare(a.createdAt))}
-function applyCategoryFilter(list){return selectedCategories.size?list.filter(e=>selectedCategories.has(e.category)):list}
+function applyFilters(list){return list.filter(e=>(!selectedCategories.size||selectedCategories.has(e.category))&&(!selectedPayments.size||selectedPayments.has(e.payment)))}
 function sumRange(a,b){return total(expenses.filter(e=>inRange(e,a,b)))}
-function render(){const list=applyCategoryFilter(selected()); const now=parseDate(today());
+function render(){const list=applyFilters(selected()); const now=parseDate(today());
   $('todaySpendTotal').textContent=money(sumRange(today(),today()));$('todaySpendDate').textContent=now.toLocaleDateString('en-MY',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
   const currentMonth=today().slice(0,7),currentWeek=calendarWeekIndex(today()),currentWeekRange=calendarWeeks(currentMonth)[currentWeek-1];
   const shortDate=s=>parseDate(s).toLocaleDateString('en-MY',{day:'numeric',month:'short'});$('weekLabel').textContent=`This week · Week ${currentWeek}`;$('weekTotal').textContent=money(sumRange(currentWeekRange.start,currentWeekRange.end));$('weekDates').textContent=`${shortDate(currentWeekRange.start)}–${shortDate(currentWeekRange.end)}`;
   $('monthTotal').textContent=money(sumRange(localDate(new Date(now.getFullYear(),now.getMonth(),1)),localDate(new Date(now.getFullYear(),now.getMonth()+1,0))));
   $('yearTotal').textContent=money(sumRange(`${now.getFullYear()}-01-01`,`${now.getFullYear()}-12-31`));$('allTotal').textContent=money(total(expenses));
-  const expenseResults=searchQuery?applyCategoryFilter(expenses).filter(e=>e.title.toLocaleLowerCase().includes(searchQuery)).sort((a,b)=>b.date.localeCompare(a.date)||b.createdAt.localeCompare(a.createdAt)):list;
-  $('filteredTotal').textContent=money(total(list));$('filteredTotalLabel').textContent=selectedCategories.size?`${selectedCategories.size} selected ${selectedCategories.size===1?'category':'categories'} total`:'All categories total';
+  const expenseResults=searchQuery?applyFilters(expenses).filter(e=>e.title.toLocaleLowerCase().includes(searchQuery)).sort((a,b)=>b.date.localeCompare(a.date)||b.createdAt.localeCompare(a.createdAt)):list;
+  $('filteredTotal').textContent=money(total(list));$('filteredTotalLabel').textContent=selectedCategories.size||selectedPayments.size?'Filtered total':'All categories and payments total';
   renderPie(list);renderMealPie(list);renderList(expenseResults)
 }
-function pieMarkup(rows,label,emptyText,withIcons=false){const colors=['#d6a73f','#2d7a67','#d8755b','#6688a6','#a678b4','#86a85d','#9a8f7a','#4f8f8b'],grand=rows.reduce((s,[,v])=>s+v,0);if(!rows.length)return `<div class="empty"><b>Nothing to show</b>${emptyText}</div>`;let at=0;const slices=rows.map(([,value],i)=>{const from=at;at+=value/grand*100;return `${colors[i%colors.length]} ${from}% ${at}%`});return `<div class="pie-wrap"><div class="pie" style="background:conic-gradient(${slices.join(',')})"><div class="pie-center"><span>${label}</span><strong>${money(grand)}</strong></div></div><div class="legend">${rows.map(([name,value],i)=>`<div class="legend-row"><span class="legend-dot" style="background:${colors[i%colors.length]}"></span><span class="legend-name">${withIcons?iconFor(name)+' ':''}${escapeHtml(name)} · ${Math.round(value/grand*100)}%</span><span class="legend-value">${money(value)}</span></div>`).join('')}</div></div>`}
+function pieMarkup(rows,label,emptyText,withIcons=false){const colors=['#d6a73f','#2d7a67','#d8755b','#6688a6','#a678b4','#86a85d','#9a8f7a','#4f8f8b','#b26f55'],grand=rows.reduce((s,[,v])=>s+v,0);if(!rows.length)return `<div class="empty"><b>Nothing to show</b>${emptyText}</div>`;let at=0;const slices=rows.map(([,value],i)=>{const from=at;at+=value/grand*100;return `${colors[i%colors.length]} ${from}% ${at}%`});return `<div class="pie-wrap"><div class="pie" style="background:conic-gradient(${slices.join(',')})"><div class="pie-center"><span>${label}</span><strong>${money(grand)}</strong></div></div><div class="legend">${rows.map(([name,value],i)=>`<div class="legend-row"><span class="legend-dot" style="background:${colors[i%colors.length]}"></span><span class="legend-name">${withIcons?iconFor(name)+' ':''}${escapeHtml(name)} · ${Math.round(value/grand*100)}%</span><span class="legend-value">${money(value)}</span></div>`).join('')}</div></div>`}
 function renderPie(list){const sums={};list.forEach(e=>sums[e.category]=(sums[e.category]||0)+Number(e.amount));$('categoryChart').innerHTML=pieMarkup(Object.entries(sums).sort((a,b)=>b[1]-a[1]),'Categories','Your category chart will appear after you add an expense.',true)
 }
 function renderMealPie(list){const sums={};list.filter(e=>isMealCategory(e.category)).forEach(e=>{const meal=e.mealType||'Not specified';sums[meal]=(sums[meal]||0)+Number(e.amount)});$('mealChart').innerHTML=pieMarkup(Object.entries(sums).sort((a,b)=>b[1]-a[1]),'Meals','Food and dining expenses for this period will appear here.')
@@ -144,8 +146,11 @@ function renderFilterControls(){let html='';if(period==='day')html=`<input id="p
   if($('periodDay'))$('periodDay').addEventListener('change',e=>{selection.day=e.target.value;page=1;render()});if($('periodMonth'))$('periodMonth').addEventListener('change',e=>{selection.month=e.target.value;if(period==='week'){selection.week=1;renderFilterControls()}page=1;render()});if($('periodWeek')){$('periodWeek').value=String(selection.week);$('periodWeek').addEventListener('change',e=>{selection.week=Number(e.target.value);page=1;render()})}if($('periodYear'))$('periodYear').addEventListener('change',e=>{selection.year=e.target.value||today().slice(0,4);page=1;render()});$('todayBtn').addEventListener('click',()=>{selectDate(today());page=1;renderFilterControls();render()})
 }
 function renderCategoryFilters(){$('categoryFilters').innerHTML=categories.map(c=>`<button type="button" class="category-chip${selectedCategories.has(c.name)?' active':''}" data-filter-category="${escapeHtml(c.name)}" aria-pressed="${selectedCategories.has(c.name)}">${c.icon} ${escapeHtml(c.name)}</button>`).join('');$('clearCategoryFilter').textContent=selectedCategories.size?'Clear filters':'All selected'}
+function renderPaymentFilters(){$('paymentFilters').innerHTML=paymentTypes.map(name=>`<button type="button" class="category-chip${selectedPayments.has(name)?' active':''}" data-filter-payment="${escapeHtml(name)}" aria-pressed="${selectedPayments.has(name)}">${name==='Cash'?'💵':'🏦'} ${escapeHtml(name)}</button>`).join('');$('clearPaymentFilter').textContent=selectedPayments.size?'Clear filters':'All selected'}
 $('categoryFilters').addEventListener('click',e=>{const name=e.target.closest('[data-filter-category]')?.dataset.filterCategory;if(!name)return;selectedCategories.has(name)?selectedCategories.delete(name):selectedCategories.add(name);page=1;renderCategoryFilters();render()});
 $('clearCategoryFilter').addEventListener('click',()=>{selectedCategories.clear();page=1;renderCategoryFilters();render()});
+$('paymentFilters').addEventListener('click',e=>{const name=e.target.closest('[data-filter-payment]')?.dataset.filterPayment;if(!name)return;selectedPayments.has(name)?selectedPayments.delete(name):selectedPayments.add(name);page=1;renderPaymentFilters();render()});
+$('clearPaymentFilter').addEventListener('click',()=>{selectedPayments.clear();page=1;renderPaymentFilters();render()});
 $('periodTabs').addEventListener('click',e=>{if(!e.target.dataset.period)return;period=e.target.dataset.period;page=1;document.querySelectorAll('#periodTabs button').forEach(b=>b.classList.toggle('active',b.dataset.period===period));renderFilterControls();render()});
 $('expenseSearch').addEventListener('input',e=>{searchQuery=e.target.value.trim().toLocaleLowerCase();page=1;render()});
 $('exportBtn').addEventListener('click',()=>{if(!window.XLSX)return toast('Excel tools are loading. Please try again online.');const rows=expenses.slice().sort((a,b)=>b.date.localeCompare(a.date)).map(e=>({'Date':e.date,'Title':e.title,'Amount (RM)':Number(e.amount),'Category':e.category,'Meal Type':e.mealType||'','Payment':e.payment,'SpendWise ID':e.id}));const sheet=XLSX.utils.json_to_sheet(rows,{header:['Date','Title','Amount (RM)','Category','Meal Type','Payment','SpendWise ID']});sheet['!cols']=[{wch:13},{wch:28},{wch:14},{wch:22},{wch:16},{wch:16},{wch:38}];const book=XLSX.utils.book_new();XLSX.utils.book_append_sheet(book,sheet,'Expenses');XLSX.writeFile(book,`SpendWise-${today()}.xlsx`);toast('Excel file exported.')});
@@ -155,7 +160,7 @@ function updateClock(){const now=new Date(),hours=now.getHours(),minutes=now.get
 updateClock();setInterval(updateClock,1000);
 if('serviceWorker' in navigator)window.addEventListener('load',()=>navigator.serviceWorker.register('./service-worker.js'));
 const standalone=matchMedia('(display-mode: standalone)').matches||navigator.standalone;if(!standalone&&/iPhone|iPad|iPod/.test(navigator.userAgent))$('installTip').style.display='block';
-renderFilterControls();renderCategoryFilters();render();
+renderFilterControls();renderCategoryFilters();renderPaymentFilters();render();
 </script>
 </body>
 </html>
