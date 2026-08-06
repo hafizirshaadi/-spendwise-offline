@@ -2,7 +2,7 @@
 
 A mobile-first personal expense tracker that works as an installable web app on iPhone.
 
-It includes a live analog and digital clock, automatic time-based themes, category and meal-type pie charts, calendar-week/month/year views, ten-item pagination, editing, and Excel import/export.
+It includes a live analog and digital clock, automatic time-based themes, multi-category filtering, category and meal-type pie charts, calendar-week/month/year views, title search, ten-item pagination, editing, and Excel import/export.
 
 ## Privacy
 
