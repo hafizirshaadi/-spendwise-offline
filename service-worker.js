@@ -1,7 +1,7 @@
-const CACHE='spendwise-offline-v19';
+const CACHE='spendwise-offline-v20';
 const ASSETS=['./','./index.html','./manifest.json','./icon.svg','https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js'];
-const CATEGORY_OLD="{name:'Room Rent',icon:'🏠'}, {name:'Clothing',icon:'👕'}, {name:'Souvenirs & Gifts',icon:'🎁'},";
-const CATEGORY_NEW="{name:'Room Rent',icon:'🏠'}, {name:'Clothing',icon:'👕'}, {name:'Aquascape & Fish',icon:'🐠'}, {name:'Souvenirs & Gifts',icon:'🎁'},";
+const CATEGORY_OLD="{name:'Room Rent',icon:'🏠'}, {name:'Clothing',icon:'👕'}, {name:'Souvenirs & Gifts',icon:'🎁'}, {name:'Aquascape & Fish',icon:'🐠'},";
+const CATEGORY_NEW="{name:'Room Rent',icon:'🏠'}, {name:'Clothing',icon:'👕'}, {name:'Aquascape & Fish',icon:'🐠'}, {name:'Souvenirs & Gifts',icon:'🎁'}, {name:'Bus Ticket',icon:'🚌'}, {name:'Car Fuel',icon:'⛽'},";
 self.addEventListener('install',event=>event.waitUntil(caches.open(CACHE).then(cache=>cache.addAll(ASSETS)).then(()=>self.skipWaiting())));
 self.addEventListener('activate',event=>event.waitUntil(caches.keys().then(keys=>Promise.all(keys.filter(key=>key!==CACHE).map(key=>caches.delete(key)))).then(()=>self.clients.claim())));
 self.addEventListener('fetch',event=>{
