@@ -1,4 +1,4 @@
-const CACHE='spendwise-offline-v21';
+const CACHE='spendwise-offline-v22';
 const ASSETS=['./','./index.html','./manifest.json','./icon.svg','https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js'];
 const CATEGORY_OLD="{name:'Room Rent',icon:'🏠'}, {name:'Clothing',icon:'👕'}, {name:'Souvenirs & Gifts',icon:'🎁'}, {name:'Aquascape & Fish',icon:'🐠'}, {name:'Bus Ticket',icon:'🚌'}, {name:'Car Fuel',icon:'⛽'}, {name:'Other Expenses',icon:'✨'}";
 const CATEGORY_NEW="{name:'Room Rent',icon:'🏠'}, {name:'Clothing',icon:'👕'}, {name:'Souvenirs & Gifts',icon:'🎁'}, {name:'Aquascape & Fish',icon:'🐠'}, {name:'Bus Ticket',icon:'🚌'}, {name:'Motor Fuel',icon:'⛽'}, {name:'Service Motor',icon:'🔧'}, {name:'Topup',icon:'📱'}, {name:'Other Expenses',icon:'✨'}";
