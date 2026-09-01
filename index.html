@@ -208,7 +208,7 @@ $('expenseList').addEventListener('pointercancel',e=>{if(!dragId||e.pointerId!==
 
 $('expenseForm').addEventListener('submit',e=>{e.preventDefault();const category=$('category').value;const record={id:editingId||crypto.randomUUID(),title:$('title').value.trim(),amount:Number($('amount').value),date:$('date').value,category,mealType:isMealCategory(category)?$('mealType').value:'',payment:$('payment').value,createdAt:new Date().toISOString()};
   if(!record.title||!record.date||record.amount<=0||(isMealCategory(category)&&!record.mealType))return toast('Please complete every field.');if(editingId){const old=expenses.find(x=>x.id===editingId);record.createdAt=old?.createdAt||record.createdAt;expenses=expenses.map(x=>x.id===editingId?record:x);toast('Expense updated.')}else{expenses.push(record);toast('Expense added.')}
-  save();expenseOrder=[record.id,...expenseOrder.filter(id=>id!==record.id)];saveOrder();resetForm();selectDate(record.date);page=1;renderFilterControls();render()
+  save();if(!editingId){expenseOrder=[record.id,...expenseOrder.filter(id=>id!==record.id)]}else if(!expenseOrder.includes(record.id)){expenseOrder.push(record.id)}saveOrder();resetForm();selectDate(record.date);page=1;renderFilterControls();render()
 });
 function resetForm(){editingId=null;$('expenseForm').reset();$('date').value=today();$('payment').value='Maybank';closeCategoryDropdown();updateCategoryLabel();$('formTitle').textContent='Add expense';$('saveBtn').textContent='Add expense';$('cancelEdit').hidden=true;toggleMealField()}
 $('cancelEdit').addEventListener('click',resetForm);
