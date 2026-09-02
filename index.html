@@ -53,7 +53,7 @@
   <section class="section"><div class="section-head"><h2 id="formTitle">Add expense</h2></div><div class="card"><form id="expenseForm"><div class="form-grid">
     <div class="field full"><label for="title">What did you buy?</label><input id="title" maxlength="80" placeholder="Example: Lunch" required></div>
     <div class="field"><label for="amount">Amount (RM)</label><input id="amount" type="number" min="0.01" step="0.01" inputmode="decimal" placeholder="0.00" required></div>
-    <div class="field"><label for="date">Date</label><input id="date" type="date" required></div>
+    <div class="field"><label for="date">Date</label><div class="date-row" style="margin-top:0"><button class="btn secondary step-btn" id="prevExpenseDateBtn" type="button" aria-label="Previous day">‹</button><input id="date" type="date" required><button class="btn secondary step-btn" id="nextExpenseDateBtn" type="button" aria-label="Next day">›</button></div></div>
     <div class="field"><label for="categoryPickerBtn">Category</label><div class="category-combo"><select id="category" hidden></select><button type="button" id="categoryPickerBtn" class="category-combo-btn"><span id="categoryPickerLabel"></span><span class="cat-search-ic">⌕</span></button><div class="category-dropdown" id="categoryDropdown" hidden><input id="categoryDropdownSearch" type="search" placeholder="Type to search category" autocomplete="off" aria-label="Search category"><div class="category-dropdown-list" id="categoryDropdownList"></div></div></div></div>
     <div class="field"><label for="payment">Payment</label><select id="payment"><option>Maybank</option><option>Bank Islam</option><option>Cash</option></select></div>
     <div class="field full" id="mealField" hidden><label for="mealType">Meal type</label><select id="mealType"><option value="" selected>Select meal type</option><option>Breakfast</option><option>Lunch</option><option>Tea</option><option>Dinner</option><option>Late Dinner</option></select></div>
@@ -110,6 +110,9 @@ const $=id=>document.getElementById(id); const localDate=d=>{const x=new Date(d)
 const today=()=>localDate(new Date()); const nowDate=today();
 const selection={day:nowDate,month:nowDate.slice(0,7),week:calendarWeekIndex(nowDate),year:nowDate.slice(0,4)};
 $('date').value=today();
+function shiftExpenseDate(dir){const d=parseDate($('date').value||today());d.setDate(d.getDate()+dir);$('date').value=localDate(d)}
+$('prevExpenseDateBtn').addEventListener('click',()=>shiftExpenseDate(-1));
+$('nextExpenseDateBtn').addEventListener('click',()=>shiftExpenseDate(1));
 $('category').innerHTML=categories.map(c=>`<option>${c.name}</option>`).join('');
 function updateCategoryLabel(){const c=categories.find(x=>x.name===$('category').value);$('categoryPickerLabel').textContent=c?`${c.icon} ${c.name}`:'Select category'}
 function renderCategoryDropdown(filter){filter=(filter||'').trim().toLocaleLowerCase();const current=$('category').value;let list=categories;if(filter){list=categories.filter(c=>c.name.toLocaleLowerCase().includes(filter)).sort((a,b)=>{const an=a.name.toLocaleLowerCase(),bn=b.name.toLocaleLowerCase();const aw=an.startsWith(filter)?0:an.split(/\s|&/).some(w=>w.startsWith(filter))?1:2;const bw=bn.startsWith(filter)?0:bn.split(/\s|&/).some(w=>w.startsWith(filter))?1:2;return aw-bw||an.localeCompare(bn)})}$('categoryDropdownList').innerHTML=list.length?list.map(c=>`<button type="button" class="category-dropdown-item${c.name===current?' active':''}" data-pick="${escapeHtml(c.name)}">${c.icon} ${escapeHtml(c.name)}</button>`).join(''):'<div class="empty" style="padding:10px">No category found.</div>'}
