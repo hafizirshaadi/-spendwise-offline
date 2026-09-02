@@ -75,6 +75,7 @@
   <section class="section"><div class="section-head"><h2>Expenses</h2><span id="resultCount" class="tag"></span></div><div class="card"><div class="expense-search"><input id="expenseSearch" type="search" placeholder="Search all expense titles" autocomplete="off" aria-label="Search all expenses by title"></div><div id="expenseList"></div><div id="pager" class="pager"></div></div></section>
 
   <details class="card"><summary>Import and export</summary><div class="tools"><button id="exportBtn" type="button">Export Excel</button><label class="file-label">Import Excel<input id="importFile" type="file" accept=".xlsx,.xls,.csv,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/vnd.ms-excel,text/csv"></label></div><div class="notice"><b>Your expenses are stored only in this browser on this iPhone.</b> Export an Excel file regularly for safekeeping. Importing a SpendWise Excel file keeps your current records and skips matching duplicates.</div></details>
+  <details class="card danger-zone"><summary>Danger zone</summary><div class="notice"><b>Delete all data</b> permanently erases every expense, category, and saved order on this device. This cannot be undone — export a backup first if you're unsure.</div><button id="deleteAllBtn" type="button" class="btn danger" style="width:100%;margin-top:10px">Delete all data</button></details>
 </div>
 <div id="categoriesView" hidden>
   <header><div class="brand"><div class="logo">🏷️</div><div><h1>Categories</h1><div class="tag">Add, rename or edit category emoji</div></div></div></header>
@@ -95,16 +96,16 @@ const STORAGE_KEY='spendwise-expenses-v1';
 const ORDER_KEY='spendwise-expense-order-v1';
 const CATEGORIES_KEY='spendwise-categories-v1';
 const DEFAULT_CATEGORIES=[
-  {name:'Food & Drink',icon:'🍽️',meal:true}, {name:'Dining & Dates',icon:'🥂',meal:true},
+  {name:'Food & Drink',icon:'🍽️',meal:true}, {name:'Dining & Dates',icon:'🥂'},
   {name:'Shopee',icon:'🛍️'}, {name:'Fuel',icon:'⛽'}, {name:'Skincare',icon:'🧴'},
   {name:'Room Rent',icon:'🏠'}, {name:'Clothing',icon:'👕'}, {name:'Souvenirs & Gifts',icon:'🎁'}, {name:'Aquascape & Fish',icon:'🐠'}, {name:'Bus Ticket',icon:'🚌'}, {name:'Car Fuel',icon:'⛽'}, {name:'Other Expenses',icon:'✨'}
 ];
-function loadCategories(){try{const data=JSON.parse(localStorage.getItem(CATEGORIES_KEY));return Array.isArray(data)&&data.length?data:DEFAULT_CATEGORIES.map(c=>({...c}))}catch{return DEFAULT_CATEGORIES.map(c=>({...c}))}}
+function loadCategories(){try{const data=JSON.parse(localStorage.getItem(CATEGORIES_KEY));if(!Array.isArray(data)||!data.length)return DEFAULT_CATEGORIES.map(c=>({...c}));const dd=data.find(c=>c.name==='Dining & Dates');if(dd&&dd.meal){dd.meal=false;localStorage.setItem(CATEGORIES_KEY,JSON.stringify(data))}return data}catch{return DEFAULT_CATEGORIES.map(c=>({...c}))}}
 function saveCategories(){localStorage.setItem(CATEGORIES_KEY,JSON.stringify(categories))}
 let categories=loadCategories();
 function lastGrapheme(str){const arr=[...String(str||'')];return arr.length?arr[arr.length-1]:''}
 function bindEmojiAutoReplace(input){if(!input)return;input.addEventListener('input',()=>{input.value=lastGrapheme(input.value)})}
-const mealTypes=['Breakfast','Lunch','Tea','Dinner','Late Dinner'];
+const mealTypes=['Breakfast','Lunch','Dinner'];
 const paymentTypes=['Maybank','Bank Islam','Cash'];
 let expenses=load(), editingId=null, period='day', page=1, searchQuery='', categorySearchQuery='', catFiltersExpanded=false;const selectedCategories=new Set(),selectedPayments=new Set();const PAGE_SIZE=10;const CATEGORY_PREVIEW_COUNT=3;
 let expenseOrder=loadOrder();
@@ -131,6 +132,7 @@ document.addEventListener('click',e=>{if(!$('categoryDropdown').hidden&&!e.targe
 window.addEventListener('pageshow',()=>setTimeout(()=>{toggleMealField();if(!editingId)$('payment').value='Maybank'},50));
 document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible')setTimeout(toggleMealField,50)});
 function refreshCategoryDependents(){$('category').innerHTML=categories.map(c=>`<option>${c.name}</option>`).join('');if(!categories.some(c=>c.name===$('category').value))$('category').value=categories[0]?.name||'';updateCategoryLabel();toggleMealField();renderCategoryFilters();renderCategoryManager();render()}
+$('deleteAllBtn').addEventListener('click',()=>{const pwd=prompt('This deletes ALL expenses and categories on this device.\nEnter password to confirm:');if(pwd===null)return;if(pwd!=='1234'){toast('Incorrect password.');return}if(!confirm('Are you absolutely sure? This cannot be undone.'))return;localStorage.removeItem(STORAGE_KEY);localStorage.removeItem(ORDER_KEY);localStorage.removeItem(CATEGORIES_KEY);expenses=[];expenseOrder=[];categories=DEFAULT_CATEGORIES.map(c=>({...c}));selectedCategories.clear();selectedPayments.clear();editingId=null;page=1;catFiltersExpanded=false;resetForm();refreshCategoryDependents();renderPaymentFilters();render();toast('All data deleted.')});
 let editingCategoryName=null;
 function renderCategoryManager(){$('categoryManageList').innerHTML=categories.length?categories.map(c=>{if(c.name===editingCategoryName)return `<div class="cat-manage-row editing" data-cat-name="${escapeHtml(c.name)}"><input class="cat-edit-icon" value="${escapeHtml(c.icon)}" maxlength="8" aria-label="Category emoji"><input class="cat-edit-name" value="${escapeHtml(c.name)}" maxlength="30" aria-label="Category name"><div class="cat-edit-actions"><button type="button" class="btn primary cat-save" data-cat="${escapeHtml(c.name)}">Save</button><button type="button" class="btn secondary cat-cancel">Cancel</button></div></div>`;return `<div class="cat-manage-row" draggable="true" data-cat-name="${escapeHtml(c.name)}"><button class="drag-handle" type="button" aria-label="Drag to reorder" title="Drag to reorder">☷</button><span class="cat-manage-icon">${c.icon}</span><span class="cat-manage-name">${escapeHtml(c.name)}</span><div class="cat-manage-actions"><button type="button" class="icon-btn cat-edit-btn" data-cat="${escapeHtml(c.name)}">Edit</button><button type="button" class="icon-btn delete cat-delete-btn" data-cat="${escapeHtml(c.name)}">Delete</button></div></div>`}).join(''):'<div class="empty"><b>No categories yet</b>Add your first category above.</div>'}
 bindEmojiAutoReplace($('newCategoryIcon'));
