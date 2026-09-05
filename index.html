@@ -96,7 +96,8 @@
     <div class="field"><label for="debtAmount">Amount (RM)</label><input id="debtAmount" type="number" inputmode="decimal" step="0.01" min="0" placeholder="0.00" required></div>
     <div class="field"><label for="debtDate">Date</label><input id="debtDate" type="date" required></div>
   </div><div class="actions"><button class="btn primary" id="debtSaveBtn" type="submit">Add debt</button><button class="btn secondary" id="debtCancelEdit" type="button" hidden>Cancel</button></div></form></div></section>
-  <section class="section"><div class="section-head"><h2>All debts</h2></div><div class="card"><div id="debtList"></div></div></section>
+  <section class="section"><div class="section-head"><h2>Unpaid</h2><span id="unpaidCount" class="tag"></span></div><div class="card"><div id="unpaidDebtList"></div></div></section>
+  <section class="section"><div class="section-head"><h2>Paid</h2><span id="paidCount" class="tag"></span></div><div class="card"><div id="paidDebtList"></div></div></section>
 </div>
 </main><div id="toast" class="toast"></div>
 <nav class="bottom-nav"><div class="bottom-nav-inner">
@@ -164,8 +165,13 @@ const DEBTS_KEY='spendwise-debts-v1';
 function loadDebts(){try{const data=JSON.parse(localStorage.getItem(DEBTS_KEY));return Array.isArray(data)?data:[]}catch{return[]}}
 function saveDebts(){localStorage.setItem(DEBTS_KEY,JSON.stringify(debts))}
 let debts=loadDebts(),editingDebtId=null;
-function renderDebts(){const sorted=debts.slice().sort((a,b)=>Number(a.paid)-Number(b.paid)||b.date.localeCompare(a.date));const unpaid=debts.filter(d=>!d.paid).reduce((s,d)=>s+Number(d.amount),0),paid=debts.filter(d=>d.paid).reduce((s,d)=>s+Number(d.amount),0);$('debtUnpaidTotal').textContent=money(unpaid);$('debtPaidTotal').textContent=money(paid);
-  $('debtList').innerHTML=sorted.length?sorted.map(d=>`<div class="debt-row${d.paid?' paid':''}"><div class="debt-top"><div><div class="debt-person">${escapeHtml(d.person)}</div><div class="debt-item">${escapeHtml(d.item)}</div><div class="debt-date">${parseDate(d.date).toLocaleDateString('en-MY',{day:'numeric',month:'short',year:'numeric'})}</div><span class="debt-badge ${d.paid?'paid':'unpaid'}">${d.paid?'Paid':'Unpaid'}</span></div><div class="debt-amount">${money(d.amount)}</div></div><div class="debt-actions"><button type="button" class="icon-btn" data-toggle-paid="${d.id}">${d.paid?'Mark unpaid':'Mark paid'}</button><button type="button" class="icon-btn" data-edit-debt="${d.id}">Edit</button><button type="button" class="icon-btn delete" data-delete-debt="${d.id}">Delete</button></div></div>`).join(''):'<div class="empty"><b>No debts yet</b>Add someone who owes you above.</div>'}
+function debtRowHtml(d){return `<div class="debt-row${d.paid?' paid':''}"><div class="debt-top"><div><div class="debt-person">${escapeHtml(d.person)}</div><div class="debt-item">${escapeHtml(d.item)}</div><div class="debt-date">${parseDate(d.date).toLocaleDateString('en-MY',{day:'numeric',month:'short',year:'numeric'})}</div></div><div class="debt-amount">${money(d.amount)}</div></div><div class="debt-actions"><button type="button" class="icon-btn" data-toggle-paid="${d.id}">${d.paid?'Undo (mark unpaid)':'Mark paid'}</button><button type="button" class="icon-btn" data-edit-debt="${d.id}">Edit</button><button type="button" class="icon-btn delete" data-delete-debt="${d.id}">Delete</button></div></div>`}
+function renderDebts(){const unpaidList=debts.filter(d=>!d.paid).sort((a,b)=>b.date.localeCompare(a.date)),paidList=debts.filter(d=>d.paid).sort((a,b)=>b.date.localeCompare(a.date));
+  const unpaidSum=unpaidList.reduce((s,d)=>s+Number(d.amount),0),paidSum=paidList.reduce((s,d)=>s+Number(d.amount),0);
+  $('debtUnpaidTotal').textContent=money(unpaidSum);$('debtPaidTotal').textContent=money(paidSum);
+  $('unpaidCount').textContent=`${unpaidList.length} owe${unpaidList.length===1?'s':''}`;$('paidCount').textContent=`${paidList.length} settled`;
+  $('unpaidDebtList').innerHTML=unpaidList.length?unpaidList.map(debtRowHtml).join(''):'<div class="empty"><b>No unpaid debts</b>Add someone who owes you above.</div>';
+  $('paidDebtList').innerHTML=paidList.length?paidList.map(debtRowHtml).join(''):'<div class="empty"><b>Nothing marked paid yet</b>Paid debts will show up here.</div>'}
 function resetDebtForm(){editingDebtId=null;$('debtForm').reset();$('debtDate').value=today();$('debtFormTitle').textContent='Add debt';$('debtSaveBtn').textContent='Add debt';$('debtCancelEdit').hidden=true}
 $('debtDate').value=today();
 $('debtForm').addEventListener('submit',e=>{e.preventDefault();const record={id:editingDebtId||crypto.randomUUID(),person:$('debtPerson').value.trim(),item:$('debtItem').value.trim(),amount:Number($('debtAmount').value),date:$('debtDate').value,paid:false};
@@ -173,10 +179,12 @@ $('debtForm').addEventListener('submit',e=>{e.preventDefault();const record={id:
   if(editingDebtId){const old=debts.find(x=>x.id===editingDebtId);record.paid=old?.paid||false;debts=debts.map(x=>x.id===editingDebtId?record:x);toast('Debt updated.')}else{debts.push(record);toast('Debt added.')}
   saveDebts();resetDebtForm();renderDebts()});
 $('debtCancelEdit').addEventListener('click',resetDebtForm);
-$('debtList').addEventListener('click',e=>{const toggleBtn=e.target.closest('[data-toggle-paid]'),editBtn=e.target.closest('[data-edit-debt]'),delBtn=e.target.closest('[data-delete-debt]');
-  if(toggleBtn){const d=debts.find(x=>x.id===toggleBtn.dataset.togglePaid);if(d){d.paid=!d.paid;saveDebts();renderDebts()}return}
+function handleDebtListClick(e){const toggleBtn=e.target.closest('[data-toggle-paid]'),editBtn=e.target.closest('[data-edit-debt]'),delBtn=e.target.closest('[data-delete-debt]');
+  if(toggleBtn){const d=debts.find(x=>x.id===toggleBtn.dataset.togglePaid);if(d){d.paid=!d.paid;saveDebts();renderDebts();toast(d.paid?'Marked as paid.':'Marked as unpaid.')}return}
   if(editBtn){const d=debts.find(x=>x.id===editBtn.dataset.editDebt);if(!d)return;editingDebtId=d.id;$('debtPerson').value=d.person;$('debtItem').value=d.item;$('debtAmount').value=d.amount;$('debtDate').value=d.date;$('debtFormTitle').textContent='Edit debt';$('debtSaveBtn').textContent='Save changes';$('debtCancelEdit').hidden=false;scrollTo({top:$('debtForm').getBoundingClientRect().top+scrollY-25,behavior:'smooth'});return}
-  if(delBtn){if(!confirm('Delete this debt entry?'))return;debts=debts.filter(x=>x.id!==delBtn.dataset.deleteDebt);saveDebts();renderDebts()}});
+  if(delBtn){if(!confirm('Delete this debt entry?'))return;debts=debts.filter(x=>x.id!==delBtn.dataset.deleteDebt);saveDebts();renderDebts()}}
+$('unpaidDebtList').addEventListener('click',handleDebtListClick);
+$('paidDebtList').addEventListener('click',handleDebtListClick);
 function showView(view){$('homeView').hidden=view!=='home';$('categoriesView').hidden=view!=='categories';$('debtsView').hidden=view!=='debts';$('navHomeBtn').classList.toggle('active',view==='home');$('navCategoriesBtn').classList.toggle('active',view==='categories');$('navDebtsBtn').classList.toggle('active',view==='debts');if(view==='categories')renderCategoryManager();if(view==='debts')renderDebts()}
 $('navHomeBtn').addEventListener('click',()=>showView('home'));
 $('navCategoriesBtn').addEventListener('click',()=>showView('categories'));
