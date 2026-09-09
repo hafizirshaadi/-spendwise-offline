@@ -95,8 +95,9 @@
   <header><div class="brand"><div class="logo">🤝</div><div><h1>Debts</h1><div class="tag">Track who owes you, and settle up</div></div></div></header>
   <section class="debt-hero"><div class="debt-hero-figure"><span>You're owed</span><strong id="debtUnpaidTotal">RM 0.00</strong></div><div class="debt-hero-sub"><span id="debtHeroCount">No debts yet</span><span id="debtPaidTotal" class="debt-hero-paid">RM 0.00 settled</span></div></section>
   <section class="section" id="debtByPersonSection" hidden><div class="section-head"><h2>By person</h2></div><div class="card"><div id="debtByPersonList"></div></div></section>
+  <section class="section"><div class="section-head"><h2>Manage names</h2></div><div class="card"><form id="debtPersonAddForm"><div class="form-grid"><div class="field full"><label for="newDebtPersonName">Add a name</label><input id="newDebtPersonName" maxlength="40" placeholder="Example: Ali"></div></div><div class="actions"><button class="btn primary" type="submit">Add name</button></div></form><div id="debtPersonManageList" style="margin-top:6px"></div></div></section>
   <section class="section"><div class="section-head"><h2 id="debtFormTitle">Add debt</h2></div><div class="card"><form id="debtForm"><div class="form-grid">
-    <div class="field"><label for="debtPerson">Who owes you?</label><input id="debtPerson" list="debtPersonList" maxlength="40" placeholder="Example: Ali" autocomplete="off" required><datalist id="debtPersonList"></datalist><div id="debtPersonHint" class="debt-person-hint" hidden></div></div>
+    <div class="field"><label for="debtPersonPickerBtn">Who owes you?</label><div class="category-combo" id="debtPersonCombo"><select id="debtPerson" hidden></select><button type="button" id="debtPersonPickerBtn" class="category-combo-btn"><span id="debtPersonPickerLabel">Select or add a name</span><span class="cat-search-ic">⌕</span></button><div class="category-dropdown" id="debtPersonDropdown" hidden><input id="debtPersonDropdownSearch" type="search" placeholder="Type to search or add a name" autocomplete="off" aria-label="Search or add a name"><div class="category-dropdown-list" id="debtPersonDropdownList"></div></div></div><div id="debtPersonHint" class="debt-person-hint" hidden></div></div>
     <div class="field"><label for="debtItem">For what?</label><input id="debtItem" maxlength="60" placeholder="Example: Lunch, movie ticket" required></div>
     <div class="field"><label for="debtAmount">Amount (RM)</label><input id="debtAmount" type="number" inputmode="decimal" step="0.01" min="0" placeholder="0.00" required></div>
     <div class="field"><label for="debtDate">Date</label><input id="debtDate" type="date" required></div>
@@ -181,6 +182,12 @@ const DEBTS_KEY='spendwise-debts-v1';
 function loadDebts(){try{const data=JSON.parse(localStorage.getItem(DEBTS_KEY));return Array.isArray(data)?data:[]}catch{return[]}}
 function saveDebts(){localStorage.setItem(DEBTS_KEY,JSON.stringify(debts))}
 let debts=loadDebts(),editingDebtId=null;
+const DEBT_PEOPLE_KEY='spendwise-debt-people-v1';
+function loadDebtPeople(){let list;try{const data=JSON.parse(localStorage.getItem(DEBT_PEOPLE_KEY));list=Array.isArray(data)?data:[]}catch{list=[]}
+  debts.forEach(d=>{const n=d.person.trim();if(n&&!list.some(p=>p.toLocaleLowerCase()===n.toLocaleLowerCase()))list.push(n)});
+  return list}
+function saveDebtPeople(){localStorage.setItem(DEBT_PEOPLE_KEY,JSON.stringify(debtPeople))}
+let debtPeople=loadDebtPeople(),editingDebtPersonName=null;
 const AVATAR_COLORS=['#1e5b4d','#b9832a','#8a5a3b','#4a7a8c','#8a4a6b','#5c7a3b'];
 function avatarColor(name){let h=0;for(let i=0;i<name.length;i++)h=(h*31+name.charCodeAt(i))>>>0;return AVATAR_COLORS[h%AVATAR_COLORS.length]}
 function initials(name){const parts=name.trim().split(/\s+/);return((parts[0]?.[0]||'')+(parts[1]?.[0]||'')).toUpperCase()||'?'}
@@ -192,15 +199,37 @@ function renderDebts(){const unpaidList=debts.filter(d=>!d.paid).sort((a,b)=>b.d
   $('unpaidCount').textContent=`${unpaidList.length} owe${unpaidList.length===1?'s':''}`;$('paidCount').textContent=`${paidList.length} settled`;
   $('unpaidDebtList').innerHTML=unpaidList.length?unpaidList.map(debtRowHtml).join(''):'<div class="empty"><b>No unpaid debts</b>Add someone who owes you above.</div>';
   $('paidDebtList').innerHTML=paidList.length?paidList.map(debtRowHtml).join(''):'<div class="empty"><b>Nothing marked paid yet</b>Paid debts will show up here.</div>';
-  renderDebtByPerson();renderDebtPersonList();updateDebtPersonHint()}
+  renderDebtByPerson();refreshDebtPersonSelect();updateDebtPersonLabel();updateDebtPersonHint()}
 function renderDebtByPerson(){const groups=new Map();debts.forEach(d=>{const key=d.person.trim().toLocaleLowerCase();if(!groups.has(key))groups.set(key,{name:d.person.trim(),owed:0,settled:0});const g=groups.get(key);if(d.paid)g.settled+=Number(d.amount);else g.owed+=Number(d.amount)});
   const list=[...groups.values()].sort((a,b)=>b.owed-a.owed||a.name.localeCompare(b.name));
   $('debtByPersonSection').hidden=!list.length;
   $('debtByPersonList').innerHTML=list.map(g=>`<div class="by-person-row"><div class="debt-avatar" style="background:${avatarColor(g.name)}">${initials(g.name)}</div><div class="by-person-name">${escapeHtml(g.name)}</div><div class="by-person-amounts"><span class="owed">${money(g.owed)}</span><span class="settled">${money(g.settled)} settled</span></div></div>`).join('')}
-function renderDebtPersonList(){const names=[...new Set(debts.map(d=>d.person.trim()).filter(Boolean))].sort((a,b)=>a.localeCompare(b));$('debtPersonList').innerHTML=names.map(n=>`<option value="${escapeHtml(n)}">`).join('')}
+function refreshDebtPersonSelect(){const sorted=debtPeople.slice().sort((a,b)=>a.localeCompare(b));const prev=$('debtPerson').value;$('debtPerson').innerHTML=sorted.map(n=>`<option>${escapeHtml(n)}</option>`).join('');if(sorted.some(n=>n===prev))$('debtPerson').value=prev}
+function updateDebtPersonLabel(){const v=$('debtPerson').value;$('debtPersonPickerLabel').textContent=v||'Select or add a name'}
+function renderDebtPersonDropdown(filter){filter=(filter||'').trim();const fl=filter.toLocaleLowerCase();const current=$('debtPerson').value;let list=debtPeople.slice().sort((a,b)=>a.localeCompare(b));if(fl)list=list.filter(n=>n.toLocaleLowerCase().includes(fl)).sort((a,b)=>{const an=a.toLocaleLowerCase(),bn=b.toLocaleLowerCase();return(an.startsWith(fl)?0:1)-(bn.startsWith(fl)?0:1)||an.localeCompare(bn)});
+  const exists=debtPeople.some(n=>n.toLocaleLowerCase()===fl);
+  let html=filter&&!exists?`<button type="button" class="category-dropdown-item" data-dp-add="${escapeHtml(filter)}">➕ Add "${escapeHtml(filter)}" as new name</button>`:'';
+  html+=list.length?list.map(n=>`<button type="button" class="category-dropdown-item${n===current?' active':''}" data-dp-pick="${escapeHtml(n)}"><span class="debt-avatar" style="width:22px;height:22px;min-width:22px;font-size:9px;background:${avatarColor(n)}">${initials(n)}</span> ${escapeHtml(n)}</button>`).join(''):(filter?'':'<div class="empty" style="padding:10px">No names yet. Type to add one.</div>');
+  $('debtPersonDropdownList').innerHTML=html}
+function selectDebtPerson(name){$('debtPerson').value=name;updateDebtPersonLabel();updateDebtPersonHint()}
+function openDebtPersonDropdown(){$('debtPersonDropdown').hidden=false;$('debtPersonPickerBtn').setAttribute('aria-expanded','true');$('debtPersonDropdownSearch').value='';renderDebtPersonDropdown('');$('debtPersonDropdownSearch').focus()}
+function closeDebtPersonDropdown(){$('debtPersonDropdown').hidden=true;$('debtPersonPickerBtn').setAttribute('aria-expanded','false')}
+$('debtPersonPickerBtn').addEventListener('click',()=>{$('debtPersonDropdown').hidden?openDebtPersonDropdown():closeDebtPersonDropdown()});
+$('debtPersonDropdownSearch').addEventListener('input',e=>renderDebtPersonDropdown(e.target.value));
+$('debtPersonDropdownList').addEventListener('click',e=>{const addBtn=e.target.closest('[data-dp-add]'),pickBtn=e.target.closest('[data-dp-pick]');
+  if(addBtn){const name=addBtn.dataset.dpAdd.trim();if(!name)return;if(!debtPeople.some(n=>n.toLocaleLowerCase()===name.toLocaleLowerCase())){debtPeople.push(name);saveDebtPeople();refreshDebtPersonSelect();renderDebtPersonManager()}selectDebtPerson(name);closeDebtPersonDropdown();return}
+  if(pickBtn){selectDebtPerson(pickBtn.dataset.dpPick);closeDebtPersonDropdown()}});
+document.addEventListener('click',e=>{if(!$('debtPersonDropdown').hidden&&!e.target.closest('#debtPersonCombo'))closeDebtPersonDropdown()});
 function updateDebtPersonHint(){const name=$('debtPerson').value.trim();if(!name)return $('debtPersonHint').hidden=true;const owed=debts.filter(d=>!d.paid&&d.person.trim().toLocaleLowerCase()===name.toLocaleLowerCase()&&d.id!==editingDebtId).reduce((s,d)=>s+Number(d.amount),0);if(owed>0){$('debtPersonHint').hidden=false;$('debtPersonHint').textContent=`${name} already owes you ${money(owed)} (unpaid)`}else{$('debtPersonHint').hidden=true}}
-$('debtPerson').addEventListener('input',updateDebtPersonHint);
-function resetDebtForm(){editingDebtId=null;$('debtForm').reset();$('debtDate').value=today();$('debtFormTitle').textContent='Add debt';$('debtSaveBtn').textContent='Add debt';$('debtCancelEdit').hidden=true;updateDebtPersonHint()}
+function renderDebtPersonManager(){$('debtPersonManageList').innerHTML=debtPeople.length?debtPeople.slice().sort((a,b)=>a.localeCompare(b)).map(n=>{if(n===editingDebtPersonName)return `<div class="cat-manage-row editing"><input class="cat-edit-name" value="${escapeHtml(n)}" maxlength="40" aria-label="Name"><div class="cat-edit-actions"><button type="button" class="btn primary dp-save" data-old="${escapeHtml(n)}">Save</button><button type="button" class="btn secondary dp-cancel">Cancel</button></div></div>`;return `<div class="cat-manage-row"><span class="debt-avatar" style="width:30px;height:30px;min-width:30px;font-size:11px;background:${avatarColor(n)}">${initials(n)}</span><span class="cat-manage-name">${escapeHtml(n)}</span><div class="cat-manage-actions"><button type="button" class="icon-btn dp-edit" data-name="${escapeHtml(n)}">Edit</button><button type="button" class="icon-btn delete dp-delete" data-name="${escapeHtml(n)}">Delete</button></div></div>`}).join(''):'<div class="empty"><b>No names yet</b>Add someone above.</div>'}
+$('debtPersonAddForm').addEventListener('submit',e=>{e.preventDefault();const name=$('newDebtPersonName').value.trim();if(!name)return toast('Please enter a name.');if(debtPeople.some(n=>n.toLocaleLowerCase()===name.toLocaleLowerCase()))return toast('That name already exists.');debtPeople.push(name);saveDebtPeople();$('debtPersonAddForm').reset();refreshDebtPersonSelect();renderDebtPersonManager();toast('Name added.')});
+$('debtPersonManageList').addEventListener('click',e=>{const editBtn=e.target.closest('.dp-edit'),delBtn=e.target.closest('.dp-delete'),saveBtn=e.target.closest('.dp-save'),cancelBtn=e.target.closest('.dp-cancel');
+  if(editBtn){editingDebtPersonName=editBtn.dataset.name;renderDebtPersonManager();return}
+  if(cancelBtn){editingDebtPersonName=null;renderDebtPersonManager();return}
+  if(saveBtn){const row=saveBtn.closest('.cat-manage-row'),oldName=saveBtn.dataset.old,newName=row.querySelector('.cat-edit-name').value.trim();if(!newName)return toast('Name cannot be empty.');if(newName.toLocaleLowerCase()!==oldName.toLocaleLowerCase()&&debtPeople.some(n=>n.toLocaleLowerCase()===newName.toLocaleLowerCase()))return toast('That name already exists.');debtPeople=debtPeople.map(n=>n===oldName?newName:n);debts.forEach(d=>{if(d.person===oldName)d.person=newName});saveDebts();saveDebtPeople();editingDebtPersonName=null;refreshDebtPersonSelect();renderDebtPersonManager();renderDebts();if($('debtPerson').value===newName)selectDebtPerson(newName);toast('Name updated.');return}
+  if(delBtn){const name=delBtn.dataset.name;if(debts.some(d=>d.person===name))return toast("Remove or reassign this person's debts before deleting the name.");if(!confirm(`Delete "${name}"?`))return;debtPeople=debtPeople.filter(n=>n!==name);saveDebtPeople();refreshDebtPersonSelect();renderDebtPersonManager();toast('Name deleted.')}});
+refreshDebtPersonSelect();renderDebtPersonManager();
+function resetDebtForm(){editingDebtId=null;$('debtForm').reset();$('debtPerson').value='';updateDebtPersonLabel();$('debtDate').value=today();$('debtFormTitle').textContent='Add debt';$('debtSaveBtn').textContent='Add debt';$('debtCancelEdit').hidden=true;updateDebtPersonHint()}
 $('debtDate').value=today();
 $('debtForm').addEventListener('submit',e=>{e.preventDefault();const record={id:editingDebtId||crypto.randomUUID(),person:$('debtPerson').value.trim(),item:$('debtItem').value.trim(),amount:Number($('debtAmount').value),date:$('debtDate').value,paid:false};
   if(!record.person||!record.item||!record.date||!(record.amount>0))return toast('Please complete every field.');
@@ -209,7 +238,7 @@ $('debtForm').addEventListener('submit',e=>{e.preventDefault();const record={id:
 $('debtCancelEdit').addEventListener('click',resetDebtForm);
 function handleDebtListClick(e){const toggleBtn=e.target.closest('[data-toggle-paid]'),editBtn=e.target.closest('[data-edit-debt]'),delBtn=e.target.closest('[data-delete-debt]');
   if(toggleBtn){const d=debts.find(x=>x.id===toggleBtn.dataset.togglePaid);if(d){d.paid=!d.paid;saveDebts();renderDebts();toast(d.paid?'Marked as paid.':'Marked as unpaid.')}return}
-  if(editBtn){const d=debts.find(x=>x.id===editBtn.dataset.editDebt);if(!d)return;editingDebtId=d.id;$('debtPerson').value=d.person;$('debtItem').value=d.item;$('debtAmount').value=d.amount;$('debtDate').value=d.date;$('debtFormTitle').textContent='Edit debt';$('debtSaveBtn').textContent='Save changes';$('debtCancelEdit').hidden=false;updateDebtPersonHint();scrollTo({top:$('debtForm').getBoundingClientRect().top+scrollY-25,behavior:'smooth'});return}
+  if(editBtn){const d=debts.find(x=>x.id===editBtn.dataset.editDebt);if(!d)return;editingDebtId=d.id;$('debtPerson').value=d.person;updateDebtPersonLabel();$('debtItem').value=d.item;$('debtAmount').value=d.amount;$('debtDate').value=d.date;$('debtFormTitle').textContent='Edit debt';$('debtSaveBtn').textContent='Save changes';$('debtCancelEdit').hidden=false;updateDebtPersonHint();scrollTo({top:$('debtForm').getBoundingClientRect().top+scrollY-25,behavior:'smooth'});return}
   if(delBtn){if(!confirm('Delete this debt entry?'))return;debts=debts.filter(x=>x.id!==delBtn.dataset.deleteDebt);saveDebts();renderDebts()}}
 $('unpaidDebtList').addEventListener('click',handleDebtListClick);
 $('paidDebtList').addEventListener('click',handleDebtListClick);
