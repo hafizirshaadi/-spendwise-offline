@@ -43,9 +43,12 @@
     .pager{display:flex;justify-content:space-between;align-items:center;margin-top:12px}.pager span{font-size:12px;color:var(--muted)}.pager button:disabled{opacity:.4}.empty{text-align:center;padding:30px 12px;color:var(--muted)}.empty b{display:block;color:var(--ink);margin-bottom:5px}
     details{margin-top:17px}summary{font-weight:750;cursor:pointer}.link-btn{display:block;margin:8px auto 0;border:0;background:transparent;color:var(--green2);font-size:12px;font-weight:800;padding:6px}.tools{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-top:12px}.tools button,.file-label{border:1px solid var(--line);background:var(--input);color:var(--ink);border-radius:12px;padding:11px;text-align:center;font-size:12px;font-weight:750}.file-label input{display:none}.notice{font-size:12px;line-height:1.5;color:var(--muted);margin-top:12px;padding:12px;background:var(--soft);border-radius:12px}.install{display:none;background:#fff6d9;border:1px solid #ead188;border-radius:15px;padding:13px;margin-bottom:14px;font-size:12px;line-height:1.45;color:#17352f}.install strong{display:block;color:#17352f;margin-bottom:3px}.toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom));transform:translateX(-50%) translateY(100px);background:#17352f;color:#fff;padding:11px 15px;border-radius:12px;z-index:20;opacity:0;transition:.25s;max-width:90%;font-size:13px}.toast.show{transform:translateX(-50%) translateY(0);opacity:1}
     @media(max-width:430px){.app{padding-left:12px;padding-right:12px}.form-grid{grid-template-columns:1fr}.field.full{grid-column:auto}.privacy{display:none}.pie-wrap{grid-template-columns:128px 1fr;gap:13px}.pie{width:128px}.pie:after{inset:27px}.pie-center{inset:35px}}
-    .bottom-nav{position:fixed;left:0;right:0;bottom:0;z-index:30;background:var(--card);border-top:1px solid var(--line);padding:6px 16px calc(6px + env(safe-area-inset-bottom));box-shadow:0 -6px 20px rgba(20,57,49,.08)}.bottom-nav-inner{max-width:760px;margin:auto;display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}.nav-btn{display:flex;flex-direction:column;align-items:center;gap:2px;border:0;background:transparent;color:var(--muted);font-size:11px;font-weight:750;padding:7px 4px;border-radius:12px}.nav-btn .nav-ic{font-size:19px}.nav-btn.active{color:var(--green2);background:var(--soft)}
+    .bottom-nav{position:fixed;left:0;right:0;bottom:0;z-index:30;background:var(--card);border-top:1px solid var(--line);padding:6px 16px calc(6px + env(safe-area-inset-bottom));box-shadow:0 -6px 20px rgba(20,57,49,.08)}.bottom-nav-inner{max-width:760px;margin:auto;display:grid;grid-template-columns:repeat(4,1fr);gap:4px}.nav-btn{display:flex;flex-direction:column;align-items:center;gap:2px;border:0;background:transparent;color:var(--muted);font-size:11px;font-weight:750;padding:7px 4px;border-radius:12px}.nav-btn .nav-ic{font-size:19px}.nav-btn.active{color:var(--green2);background:var(--soft)}
     .cat-manage-row{display:flex;align-items:center;gap:10px;padding:11px 0;border-bottom:1px solid var(--line-soft);user-select:none}.cat-manage-row:last-child{border:0}.cat-manage-row.dragging{opacity:.45}.cat-manage-row .drag-handle{width:22px;height:30px;flex:0 0 auto}.cat-manage-icon{font-size:20px;width:30px;text-align:center}.cat-manage-name{flex:1;font-weight:700}.cat-manage-actions{display:flex;gap:6px}.cat-manage-row.editing{flex-wrap:wrap}.cat-edit-icon{width:64px;flex:0 0 auto}.cat-edit-name{flex:1;min-width:120px}.cat-edit-actions{display:flex;gap:6px;width:100%;margin-top:8px}.cat-edit-actions .btn{flex:1;min-height:38px;padding:9px}
     .debt-person-hint{margin-top:7px;font-size:11.5px;font-weight:700;color:var(--green2);background:var(--soft);padding:7px 10px;border-radius:9px}
+
+    .biz-hero{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:14px 0}.biz-hero .biz-main{grid-column:1/-1;background:linear-gradient(150deg,var(--green),var(--green2));color:#fff;border-radius:22px;padding:20px 22px;box-shadow:var(--shadow)}.biz-hero .biz-main span{font-size:12px;opacity:.8;font-weight:700}.biz-hero .biz-main strong{display:block;font-size:30px;margin-top:4px}.biz-stat{background:var(--card);border:1px solid rgba(18,63,53,.08);border-radius:18px;padding:14px 16px}.biz-stat span{font-size:11px;color:var(--muted);font-weight:700}.biz-stat strong{display:block;font-size:18px;margin-top:3px}.biz-stat strong.neg{color:var(--danger)}
+    .biz-prod{padding:12px 0;border-top:1px solid var(--line)}.biz-prod:first-child{border-top:0}.biz-prod-top{display:flex;justify-content:space-between;gap:10px;font-weight:800}.biz-prod-sub{font-size:12px;color:var(--muted);margin-top:3px}.biz-row{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:11px 0;border-top:1px solid var(--line)}.biz-row:first-child{border-top:0}.biz-row b{display:block}.biz-row small{color:var(--muted)}.biz-row .biz-amt{font-weight:800;text-align:right;white-space:nowrap}.biz-btns{display:flex;gap:6px;margin-top:4px;justify-content:flex-end}
     .debt-hero{position:relative;overflow:hidden;background:linear-gradient(150deg,var(--gold),#b9832a);border-radius:22px;padding:20px 22px;margin:14px 0;box-shadow:var(--shadow);color:#2b2107}
     .by-person-row{display:flex;align-items:flex-start;gap:10px;padding:10px 0;border-bottom:1px solid var(--line-soft)}.by-person-row:last-child{border:0}.by-person-body{flex:1;min-width:0}.by-person-name{font-weight:750;font-size:13.5px}.by-person-items{margin-top:3px;max-height:96px;overflow-y:auto;-webkit-overflow-scrolling:touch}.bpi-row{display:flex;align-items:center;gap:5px;font-size:11px;color:var(--ink);padding:1.5px 0}.bpi-num{color:var(--muted);flex:0 0 auto}.bpi-text{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.bpi-price{flex:0 0 auto;color:var(--muted);font-weight:700}.bpi-tick{color:#2f8a5c;font-weight:800;flex:0 0 auto}.bpi-row.bpi-paid .bpi-text,.bpi-row.bpi-paid .bpi-price{color:var(--muted);text-decoration:line-through}.by-person-amounts{text-align:right;font-size:12px;white-space:nowrap}.by-person-amounts .owed{font-weight:800;color:var(--danger)}.by-person-amounts .settled{display:block;font-size:10.5px;color:var(--muted);margin-top:2px}.by-person-amounts .all-settled{font-weight:800;font-size:11px;color:#2f8a5c}.debt-hero:after{content:"";position:absolute;width:150px;height:150px;border:26px solid rgba(255,255,255,.12);border-radius:50%;right:-70px;top:-75px}.debt-hero-figure{position:relative;z-index:1}.debt-hero-figure span{display:block;font-size:12px;font-weight:750;color:rgba(43,33,7,.72)}.debt-hero-figure strong{display:block;font-size:34px;font-weight:850;line-height:1.1;margin-top:4px;color:#2b2107}.debt-hero-sub{position:relative;z-index:1;display:flex;justify-content:space-between;align-items:center;margin-top:14px;padding-top:12px;border-top:1px solid rgba(43,33,7,.16);font-size:12px;font-weight:700;color:rgba(43,33,7,.8)}.debt-hero-paid{color:rgba(43,33,7,.8)}
     .count-pill{font-size:10px;font-weight:800;padding:4px 10px;border-radius:99px}.count-pill.unpaid{background:#fdecea;color:var(--danger)}.count-pill.paid{background:var(--soft);color:var(--green2)}
@@ -109,12 +112,34 @@
   <details class="card"><summary>Paid <span id="paidCount" class="count-pill paid"></span></summary><div id="paidDebtList"></div></details>
   <details class="card"><summary>Manage names</summary><form id="debtPersonAddForm"><div class="form-grid"><div class="field full"><label for="newDebtPersonName">Add a name</label><input id="newDebtPersonName" maxlength="40" placeholder="Example: Ali"></div></div><div class="actions"><button class="btn primary" type="submit">Add name</button></div></form><div id="debtPersonManageList" style="margin-top:6px"></div></details>
 </div>
+<div id="businessView" hidden>
+  <header><div class="brand"><div class="logo">📦</div><div><h1>Business</h1><div class="tag">Track stock you buy and sell</div></div></div></header>
+  <section class="biz-hero"><div class="biz-main"><span>Total bought</span><strong id="bizTotalBought">RM 0.00</strong></div><div class="biz-stat"><span>Total sold</span><strong id="bizTotalSold">RM 0.00</strong></div><div class="biz-stat"><span>Profit</span><strong id="bizProfit">RM 0.00</strong></div></section>
+  <section class="section"><div class="section-head"><h2>Stock by product</h2></div><div class="card"><div id="bizProducts"></div></div></section>
+  <section class="section"><div class="section-head"><h2 id="bizBuyTitle">Add purchase</h2></div><div class="card"><form id="bizBuyForm"><div class="form-grid">
+    <div class="field full"><label for="bizBuyProduct">Product</label><input id="bizBuyProduct" list="bizProductList" maxlength="60" placeholder="Example: Keychain" required></div>
+    <div class="field"><label for="bizBuyQty">How many</label><input id="bizBuyQty" type="number" inputmode="numeric" min="1" step="1" placeholder="0" required></div>
+    <div class="field"><label for="bizBuyPrice">Cost each (RM)</label><input id="bizBuyPrice" type="number" inputmode="decimal" step="0.01" min="0" placeholder="0.00" required></div>
+    <div class="field"><label for="bizBuyDate">Date</label><input id="bizBuyDate" type="date" required></div>
+    <div class="field"><label for="bizBuyPayment">Payment</label><select id="bizBuyPayment"><option>Maybank</option><option>Bank Islam</option><option>Cash</option></select></div>
+  </div><div class="biz-stat" style="margin-top:10px"><span>Total for this purchase</span><strong id="bizBuyTotal">RM 0.00</strong></div><div class="actions"><button class="btn primary" type="submit" id="bizBuySave">Add purchase</button><button class="btn secondary" type="button" id="bizBuyCancel" hidden>Cancel</button></div></form></div></section>
+  <section class="section"><div class="section-head"><h2 id="bizSellTitle">Record sale</h2></div><div class="card"><form id="bizSellForm"><div class="form-grid">
+    <div class="field full"><label for="bizSellProduct">Product</label><select id="bizSellProduct" required></select></div>
+    <div class="field"><label for="bizSellQty">How many sold</label><input id="bizSellQty" type="number" inputmode="numeric" min="1" step="1" placeholder="0" required></div>
+    <div class="field"><label for="bizSellPrice">Price each (RM)</label><input id="bizSellPrice" type="number" inputmode="decimal" step="0.01" min="0" placeholder="0.00" required></div>
+    <div class="field full"><label for="bizSellDate">Date</label><input id="bizSellDate" type="date" required></div>
+  </div><div class="biz-stat" style="margin-top:10px"><span>Total for this sale</span><strong id="bizSellTotal">RM 0.00</strong></div><div class="actions"><button class="btn primary" type="submit" id="bizSellSave">Record sale</button><button class="btn secondary" type="button" id="bizSellCancel" hidden>Cancel</button></div></form></div></section>
+  <datalist id="bizProductList"></datalist>
+  <details class="card"><summary>Purchases <span id="bizBuyCount" class="count-pill paid"></span></summary><div id="bizBuyList"></div></details>
+  <details class="card"><summary>Sales <span id="bizSellCount" class="count-pill paid"></span></summary><div id="bizSellList"></div></details>
+</div>
 </main><div id="toast" class="toast"></div>
 <div id="attachmentViewer" class="attachment-viewer" hidden><button type="button" id="attachmentViewerClose" class="attachment-viewer-close" aria-label="Close">✕</button><img id="attachmentViewerImg" alt="Expense attachment"></div>
 <nav class="bottom-nav"><div class="bottom-nav-inner">
   <button type="button" id="navHomeBtn" class="nav-btn active" data-view="home"><span class="nav-ic">🏠</span>Home</button>
   <button type="button" id="navCategoriesBtn" class="nav-btn" data-view="categories"><span class="nav-ic">🏷️</span>Categories</button>
   <button type="button" id="navDebtsBtn" class="nav-btn" data-view="debts"><span class="nav-ic">🤝</span>Debts</button>
+  <button type="button" id="navBusinessBtn" class="nav-btn" data-view="business"><span class="nav-ic">📦</span>Business</button>
 </div></nav>
 <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
 <script>
@@ -250,7 +275,7 @@ function handleDebtListClick(e){const toggleBtn=e.target.closest('[data-toggle-p
   if(delBtn){if(!confirm('Delete this debt entry?'))return;debts=debts.filter(x=>x.id!==delBtn.dataset.deleteDebt);saveDebts();renderDebts()}}
 $('unpaidDebtList').addEventListener('click',handleDebtListClick);
 $('paidDebtList').addEventListener('click',handleDebtListClick);
-function showView(view){$('homeView').hidden=view!=='home';$('categoriesView').hidden=view!=='categories';$('debtsView').hidden=view!=='debts';$('navHomeBtn').classList.toggle('active',view==='home');$('navCategoriesBtn').classList.toggle('active',view==='categories');$('navDebtsBtn').classList.toggle('active',view==='debts');if(view==='categories')renderCategoryManager();if(view==='debts')renderDebts()}
+function showView(view){$('homeView').hidden=view!=='home';$('categoriesView').hidden=view!=='categories';$('debtsView').hidden=view!=='debts';$('businessView').hidden=view!=='business';$('navBusinessBtn').classList.toggle('active',view==='business');$('navHomeBtn').classList.toggle('active',view==='home');$('navCategoriesBtn').classList.toggle('active',view==='categories');$('navDebtsBtn').classList.toggle('active',view==='debts');if(view==='categories')renderCategoryManager();if(view==='debts')renderDebts();if(view==='business')renderBusiness()}
 $('navHomeBtn').addEventListener('click',()=>showView('home'));
 $('navCategoriesBtn').addEventListener('click',()=>showView('categories'));
 $('navDebtsBtn').addEventListener('click',()=>showView('debts'));
@@ -374,6 +399,53 @@ updateClock();setInterval(updateClock,1000);
 if('serviceWorker' in navigator)window.addEventListener('load',()=>navigator.serviceWorker.register('./service-worker.js'));
 const standalone=matchMedia('(display-mode: standalone)').matches||navigator.standalone;if(!standalone&&/iPhone|iPad|iPod/.test(navigator.userAgent))$('installTip').style.display='block';
 renderFilterControls();renderCategoryFilters();renderPaymentFilters();render();
+
+const BIZ_KEY='spendwise-business-v1',BIZ_CAT='Business Stock';
+let biz=(()=>{try{const d=JSON.parse(localStorage.getItem(BIZ_KEY));return{buys:Array.isArray(d?.buys)?d.buys:[],sells:Array.isArray(d?.sells)?d.sells:[]}}catch{return{buys:[],sells:[]}}})();
+let bizEditBuy=null,bizEditSell=null;
+function saveBiz(){localStorage.setItem(BIZ_KEY,JSON.stringify(biz))}
+const bizKey=n=>String(n).trim().toLowerCase();
+function bizSyncExpense(b){const id='biz-'+b.id;if(!categories.some(c=>c.name===BIZ_CAT)){categories.push({name:BIZ_CAT,icon:'📦'});saveCategories();refreshCategoryDependents()}
+ const rec={id,title:`${b.product} ×${b.qty}`,amount:Math.round(b.qty*b.price*100)/100,date:b.date,category:BIZ_CAT,payment:b.payment||'Cash',attachment:'',createdAt:b.createdAt||new Date().toISOString()};
+ const i=expenses.findIndex(x=>x.id===id);if(i>=0)expenses[i]={...expenses[i],...rec,attachment:expenses[i].attachment||''};else{expenses.push(rec);expenseOrder=[id,...expenseOrder.filter(x=>x!==id)]}
+ save();saveOrder();render()}
+function bizRemoveExpense(bid){const id='biz-'+bid;expenses=expenses.filter(x=>x.id!==id);save();syncOrder();render()}
+function bizStats(){const m=new Map();for(const b of biz.buys){const k=bizKey(b.product);const o=m.get(k)||{name:b.product,bought:0,cost:0,sold:0,rev:0};o.bought+=b.qty;o.cost+=b.qty*b.price;m.set(k,o)}
+ for(const x of biz.sells){const k=bizKey(x.product);const o=m.get(k)||{name:x.product,bought:0,cost:0,sold:0,rev:0};o.sold+=x.qty;o.rev+=x.qty*x.price;m.set(k,o)}
+ return [...m.values()].sort((a,b)=>a.name.localeCompare(b.name))}
+function renderBusiness(){const st=bizStats();const bought=biz.buys.reduce((a,b)=>a+b.qty*b.price,0),sold=biz.sells.reduce((a,b)=>a+b.qty*b.price,0);
+ let costOfSold=0;for(const o of st)if(o.bought>0)costOfSold+=o.sold*(o.cost/o.bought);const profit=sold-costOfSold;
+ $('bizTotalBought').textContent=money(bought);$('bizTotalSold').textContent=money(sold);$('bizProfit').textContent=money(profit);$('bizProfit').classList.toggle('neg',profit<0);
+ $('bizProducts').innerHTML=st.length?st.map(o=>`<div class="biz-prod"><div class="biz-prod-top"><span>${escapeHtml(o.name)}</span><span>${money(o.cost)}</span></div><div class="biz-prod-sub">Bought ${o.bought} · Sold ${o.sold} · <b>${o.bought-o.sold} left</b>${o.sold?` · Sales ${money(o.rev)}`:''}</div></div>`).join(''):'<div class="biz-prod-sub">No products yet. Add your first purchase below.</div>';
+ $('bizProductList').innerHTML=st.map(o=>`<option value="${escapeHtml(o.name)}">`).join('');
+ const cur=$('bizSellProduct').value;$('bizSellProduct').innerHTML='<option value="">Select product</option>'+st.map(o=>`<option value="${escapeHtml(o.name)}">${escapeHtml(o.name)} (${o.bought-o.sold} left)</option>`).join('');$('bizSellProduct').value=cur;
+ const buys=biz.buys.slice().sort((a,b)=>b.date.localeCompare(a.date)),sells=biz.sells.slice().sort((a,b)=>b.date.localeCompare(a.date));
+ $('bizBuyCount').textContent=buys.length||'';$('bizSellCount').textContent=sells.length||'';
+ const row=(x,kind)=>`<div class="biz-row"><div><b>${escapeHtml(x.product)}</b><small>${x.date} · ${x.qty} × ${money(x.price)}</small></div><div><div class="biz-amt">${money(x.qty*x.price)}</div><div class="biz-btns"><button class="btn secondary" type="button" data-biz-edit="${kind}:${x.id}">Edit</button><button class="btn secondary" type="button" data-biz-del="${kind}:${x.id}">Delete</button></div></div></div>`;
+ $('bizBuyList').innerHTML=buys.map(x=>row(x,'buy')).join('')||'<div class="biz-prod-sub">No purchases yet.</div>';
+ $('bizSellList').innerHTML=sells.map(x=>row(x,'sell')).join('')||'<div class="biz-prod-sub">No sales yet.</div>'}
+function bizUpdTotals(){$('bizBuyTotal').textContent=money((+$('bizBuyQty').value||0)*(+$('bizBuyPrice').value||0));$('bizSellTotal').textContent=money((+$('bizSellQty').value||0)*(+$('bizSellPrice').value||0))}
+['bizBuyQty','bizBuyPrice','bizSellQty','bizSellPrice'].forEach(i=>$(i).addEventListener('input',bizUpdTotals));
+function bizResetBuy(){bizEditBuy=null;$('bizBuyForm').reset();$('bizBuyDate').value=today();$('bizBuyTitle').textContent='Add purchase';$('bizBuySave').textContent='Add purchase';$('bizBuyCancel').hidden=true;bizUpdTotals()}
+function bizResetSell(){bizEditSell=null;$('bizSellForm').reset();$('bizSellDate').value=today();$('bizSellTitle').textContent='Record sale';$('bizSellSave').textContent='Record sale';$('bizSellCancel').hidden=true;bizUpdTotals()}
+$('bizBuyCancel').addEventListener('click',bizResetBuy);$('bizSellCancel').addEventListener('click',bizResetSell);
+$('bizBuyForm').addEventListener('submit',e=>{e.preventDefault();const b={id:bizEditBuy||crypto.randomUUID(),product:$('bizBuyProduct').value.trim(),qty:Math.floor(+$('bizBuyQty').value),price:+$('bizBuyPrice').value,date:$('bizBuyDate').value,payment:$('bizBuyPayment').value,createdAt:new Date().toISOString()};
+ if(!b.product||b.qty<1||b.price<0||!b.date)return toast('Please complete every field.');
+ const ex=biz.buys.find(x=>bizKey(x.product)===bizKey(b.product));if(ex)b.product=ex.product;
+ if(bizEditBuy){const old=biz.buys.find(x=>x.id===bizEditBuy);b.createdAt=old?.createdAt||b.createdAt;biz.buys=biz.buys.map(x=>x.id===bizEditBuy?b:x);toast('Purchase updated.')}else{biz.buys.push(b);toast('Purchase added.')}
+ saveBiz();bizSyncExpense(b);bizResetBuy();renderBusiness()});
+$('bizSellForm').addEventListener('submit',e=>{e.preventDefault();const x={id:bizEditSell||crypto.randomUUID(),product:$('bizSellProduct').value,qty:Math.floor(+$('bizSellQty').value),price:+$('bizSellPrice').value,date:$('bizSellDate').value};
+ if(!x.product||x.qty<1||x.price<0||!x.date)return toast('Please complete every field.');
+ const o=bizStats().find(o=>bizKey(o.name)===bizKey(x.product));const other=bizEditSell?(biz.sells.find(s=>s.id===bizEditSell)?.qty||0):0;
+ if(o&&x.qty>o.bought-o.sold+other&&!confirm(`Only ${o.bought-o.sold+other} left in stock. Record anyway?`))return;
+ if(bizEditSell){biz.sells=biz.sells.map(s=>s.id===bizEditSell?x:s);toast('Sale updated.')}else{biz.sells.push(x);toast('Sale recorded.')}
+ saveBiz();bizResetSell();renderBusiness()});
+$('businessView').addEventListener('click',e=>{const ed=e.target.dataset.bizEdit,del=e.target.dataset.bizDel;
+ if(ed){const [k,id]=ed.split(':');if(k==='buy'){const b=biz.buys.find(x=>x.id===id);if(!b)return;bizEditBuy=id;$('bizBuyProduct').value=b.product;$('bizBuyQty').value=b.qty;$('bizBuyPrice').value=b.price;$('bizBuyDate').value=b.date;$('bizBuyPayment').value=b.payment||'Cash';$('bizBuyTitle').textContent='Edit purchase';$('bizBuySave').textContent='Save changes';$('bizBuyCancel').hidden=false;bizUpdTotals();$('bizBuyForm').scrollIntoView({behavior:'smooth',block:'center'})}
+  else{const x=biz.sells.find(s=>s.id===id);if(!x)return;bizEditSell=id;$('bizSellProduct').value=x.product;$('bizSellQty').value=x.qty;$('bizSellPrice').value=x.price;$('bizSellDate').value=x.date;$('bizSellTitle').textContent='Edit sale';$('bizSellSave').textContent='Save changes';$('bizSellCancel').hidden=false;bizUpdTotals();$('bizSellForm').scrollIntoView({behavior:'smooth',block:'center'})}}
+ if(del){const [k,id]=del.split(':');if(!confirm('Delete this entry?'))return;if(k==='buy'){biz.buys=biz.buys.filter(x=>x.id!==id);saveBiz();bizRemoveExpense(id)}else{biz.sells=biz.sells.filter(x=>x.id!==id);saveBiz()}renderBusiness();toast('Deleted.')}});
+$('navBusinessBtn').addEventListener('click',()=>showView('business'));
+bizResetBuy();bizResetSell();renderBusiness();
 </script>
 </body>
 </html>
